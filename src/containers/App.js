@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import classes from './App.css';
-import Person from '../components/Persons/Person/Person';
 import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/Cockpit/Cockpit';
+import WithClass from '../hoc/withClass';
+import Aux from '../hoc/Auxiliary';
 
 class App extends Component {
 
@@ -18,7 +19,8 @@ class App extends Component {
       { id: 'salsasalsa', name: 'Stephanie', age: 26 }
     ],
     otherState: 'some other value',
-    showPersons: false
+    showPersons: false,
+    showCockpit: true
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -26,22 +28,21 @@ class App extends Component {
     return state;
   }
 
-  componentWillMount() {
-    console.log('[App.js] componentWillMount');
-  }
+  // componentWillMount() {
+  //   console.log('[App.js] componentWillMount');
+  // }
 
   componentDidMount() {
     console.log('[App.js] componentDidMount');
   }
 
-  switchNameHandler = (newName) => {
-    this.setState({
-      persons: [
-        { name: newName, age: 28 },
-        { name: 'Manu', age: 29 },
-        { name: 'Stephanie', age: 27 }
-      ]
-    });
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('[App.js] shouldComponentUpdate');
+    return true;
+  }
+
+  componentDidUpdate() {
+    console.log('[App.js] componentDidUpdate');
   }
 
   nameChangedHandler = (event, id) => {
@@ -59,21 +60,22 @@ class App extends Component {
     persons[personIndex] = person;
 
     this.setState({persons: persons});
-  }
+  };
 
   deletePersonHandler = (personIndex) => {
     const persons = [...this.state.persons];
     persons.splice(personIndex, 1);
     this.setState({persons: persons});
-  }
+  };
 
   togglePersonsHandler = () => {
     const doesShow = this.state.showPersons;
     this.setState({ showPersons: !doesShow });
-  }
+  };
 
   render() {
 
+    console.log('[App.js] render');
     let persons = null;
 
     if (this.state.showPersons) {
@@ -86,16 +88,20 @@ class App extends Component {
     }
 
     return (
-      <div className={classes.App}>
-        <Cockpit 
-          title={this.props.appTitle}
-          showPersons={this.state.showPersons}
-          persons={this.state.persons}
-          clicked={this.togglePersonsHandler} />
+      <Aux>
+        <button onClick={() => {this.setState({ showCockpit: false })}}>Remove Cockpit</button>
+        {this.state.showCockpit ? (
+          <Cockpit 
+            title={this.props.appTitle}
+            showPersons={this.state.showPersons}
+            personsLength={this.state.persons.length}
+            clicked={this.togglePersonsHandler} 
+          />
+        ) : null}
         {persons}
-      </div>
+      </Aux>
     );
   }
 };
 
-export default App;
+export default withClass(App, classes.App);
